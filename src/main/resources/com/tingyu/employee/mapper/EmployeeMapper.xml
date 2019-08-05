@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tingyu.employee.mapper.EmployeeMapper">
+	<resultMap id="BaseResultMap"
+		type="com.tingyu.employee.pojo.Employee">
+		<id column="emp_id" jdbcType="BIGINT" property="empId" />
+		<result column="emp_name" jdbcType="VARCHAR" property="empName" />
+		<result column="gender" jdbcType="CHAR" property="gender" />
+		<result column="email" jdbcType="VARCHAR" property="email" />
+		<result column="dept_id" jdbcType="INTEGER" property="deptId" />
+	</resultMap>
+	<resultMap id="BaseResultWithDeptMap"
+		type="com.tingyu.employee.pojo.Employee">
+		<id column="emp_id" jdbcType="BIGINT" property="empId" />
+		<result column="emp_name" jdbcType="VARCHAR" property="empName" />
+		<result column="gender" jdbcType="CHAR" property="gender" />
+		<result column="email" jdbcType="VARCHAR" property="email" />
+		<association property="department"
+			javaType="com.tingyu.employee.pojo.Department">
+			<id column="dept_id" jdbcType="INTEGER" property="deptId" />
+			<result column="dept_name" jdbcType="VARCHAR"
+				property="deptName" />
+		</association>
+
+	</resultMap>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from
+		tbl_employee
+		where emp_id = #{empId,jdbcType=BIGINT}
+	</delete>
+	<delete id="deleteByIds" parameterType="java.util.List">
+		delete from tbl_employee
+		where emp_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<insert id="insert"
+		parameterType="com.tingyu.employee.pojo.Employee">
+		insert into tbl_employee (emp_id, emp_name, gender,
+		email, dept_id)
+		values (#{empId,jdbcType=BIGINT},
+		#{empName,jdbcType=VARCHAR},
+		#{gender,jdbcType=CHAR},
+		#{email,jdbcType=VARCHAR}, #{deptId,jdbcType=INTEGER})
+	</insert>
+	<update id="updateByPrimaryKey"
+		parameterType="com.tingyu.employee.pojo.Employee">
+		update tbl_employee
+		<set>
+			<if test="empName != null">
+				emp_name = #{empName,jdbcType=VARCHAR},
+			</if>
+			<if test="gender != null">
+				gender = #{gender,jdbcType=CHAR},
+			</if>
+			<if test="email != null">
+				email = #{email,jdbcType=VARCHAR},
+			</if>
+			<if test="deptId != null">
+				dept_id = #{deptId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where emp_id = #{empId,jdbcType=BIGINT}
+	</update>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Long"
+		resultMap="BaseResultMap">
+		select emp_id, emp_name, gender, email, dept_id
+		from
+		tbl_employee
+		where emp_id = #{empId,jdbcType=BIGINT}
+	</select>
+	<select id="selectAll" resultMap="BaseResultMap">
+		select emp_id, emp_name,
+		gender, email, dept_id
+		from tbl_employee
+	</select>
+	<select id="selectByPrimaryKeyWithDept"
+		parameterType="java.lang.Long" resultMap="BaseResultWithDeptMap">
+		select e.emp_id, e.emp_name,
+		e.gender, e.email, e.dept_id,d.dept_name
+		from tbl_employee as e
+		left
+		join tbl_department as d
+		on e.dept_id=d.dept_id
+		where e.emp_id =
+		#{empId,jdbcType=BIGINT}
+	</select>
+	<select id="selectAllWithDept" parameterType="java.lang.Long"
+		resultMap="BaseResultWithDeptMap">
+		select e.emp_id, e.emp_name, e.gender, e.email,
+		e.dept_id,d.dept_name
+		from tbl_employee as e
+		left join tbl_department as
+		d
+		on e.dept_id=d.dept_id
+
+	</select>
+</mapper>
